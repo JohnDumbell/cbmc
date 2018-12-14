@@ -1015,16 +1015,19 @@ static void find_and_replace_parameter(
     const std::string &replacement_parameter_full_name =
       id2string(replacement_parameter_p->type_variable().get_identifier());
 
-    // the replacement parameter is a viable one, i.e., it comes from an outer
-    // class
-    PRECONDITION(
-      parameter_full_name.substr(0, parameter_full_name.rfind("::"))
-        .compare(
-          replacement_parameter_full_name.substr(
-            0, replacement_parameter_full_name.rfind("::"))) > 0);
+    if (parameter_full_name != replacement_parameter_full_name)
+    {
+      // the replacement parameter is a viable one, i.e., it comes from an outer
+      // class
+      PRECONDITION(
+        parameter_full_name.substr(0, parameter_full_name.rfind("::"))
+          .compare(
+            replacement_parameter_full_name.substr(
+              0, replacement_parameter_full_name.rfind("::"))) > 0);
 
-    parameter.type_variable_ref().set_identifier(
-      replacement_parameter_full_name);
+      parameter.type_variable_ref().set_identifier(
+        replacement_parameter_full_name);
+    }
   }
 }
 
