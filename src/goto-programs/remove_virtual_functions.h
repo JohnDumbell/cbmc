@@ -36,6 +36,13 @@ void remove_virtual_functions(
 /// May change the location numbers in `function`.
 /// \param function: function from which virtual functions should be converted
 ///   to explicit dispatch tables.
+void remove_virtual_functions(goto_model_functiont &function,
+                              const class_hierarchyt &class_hierarchy);
+
+/// Remove virtual functions from one function.
+/// May change the location numbers in `function`.
+/// \param function: function from which virtual functions should be converted
+///   to explicit dispatch tables.
 void remove_virtual_functions(goto_model_functiont &function);
 
 /// Specifies remove_virtual_function's behaviour when the actual supplied
