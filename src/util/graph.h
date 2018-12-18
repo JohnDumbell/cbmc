@@ -614,8 +614,10 @@ std::vector<typename N::node_indext> grapht<N>::get_reachable(
   bool forwards) const
 {
   std::vector<node_indext> result;
-  std::vector<bool> visited(size(), false);
+  if (nodes.empty())
+    return result;
 
+  std::vector<bool> visited(size(), false);
   std::stack<node_indext, std::vector<node_indext>> s(src);
 
   while(!s.empty())
