@@ -38,7 +38,7 @@ public:
     irep_idt function_id;
     // The program counter is an iterator which indicates where the execution
     // is in its program sequence
-    goto_programt::const_targett pc;
+    goto_programt::const_targett program_counter;
     bool is_set;
 
     sourcet() : thread_nr(0), function_id(irep_idt()), is_set(false)
@@ -46,7 +46,10 @@ public:
     }
 
     sourcet(const irep_idt &_function_id, goto_programt::const_targett _pc)
-      : thread_nr(0), function_id(_function_id), pc(_pc), is_set(true)
+      : thread_nr(0),
+        function_id(_function_id),
+        program_counter(_pc),
+        is_set(true)
     {
     }
 
@@ -55,7 +58,7 @@ public:
       const goto_programt &_goto_program)
       : thread_nr(0),
         function_id(_function_id),
-        pc(_goto_program.instructions.begin()),
+        program_counter(_goto_program.instructions.begin()),
         is_set(true)
     {
     }

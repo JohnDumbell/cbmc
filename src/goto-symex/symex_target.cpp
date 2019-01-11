@@ -16,7 +16,7 @@ bool operator<(
   const symex_targett::sourcet &b)
 {
   if(a.thread_nr==b.thread_nr)
-    return a.pc < b.pc;
+    return a.program_counter < b.program_counter;
   else
     return a.thread_nr < b.thread_nr;
 }

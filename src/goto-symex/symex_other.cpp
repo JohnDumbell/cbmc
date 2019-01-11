@@ -34,8 +34,8 @@ void goto_symext::havoc_rec(
 
     code_assignt assignment;
     assignment.lhs()=lhs;
-    assignment.rhs() =
-      side_effect_expr_nondett(dest.type(), state.source.pc->source_location);
+    assignment.rhs() = side_effect_expr_nondett(
+      dest.type(), state.source.program_counter->source_location);
 
     symex_assign(state, assignment);
   }
@@ -77,7 +77,8 @@ void goto_symext::havoc_rec(
 void goto_symext::symex_other(
   statet &state)
 {
-  const goto_programt::instructiont &instruction=*state.source.pc;
+  const goto_programt::instructiont &instruction =
+    *state.source.program_counter;
 
   const codet &code = instruction.code;
 

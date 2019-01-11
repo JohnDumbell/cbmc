@@ -18,7 +18,7 @@ void goto_symext::symex_catch(statet &)
   // there are two variants: 'push' and 'pop'
 
   #if 0
-  const goto_programt::instructiont &instruction=*state.source.pc;
+  const goto_programt::instructiont &instruction=*state.source.program_counter;
 
   if(instruction.targets.empty()) // pop
   {

@@ -224,11 +224,11 @@ bool bmc_covert::operator()()
   {
     if(it->is_assert())
     {
-      PRECONDITION(it->source.pc->is_assert());
+      PRECONDITION(it->source.program_counter->is_assert());
       const and_exprt c(
         literal_exprt(it->guard_literal), literal_exprt(!it->cond_literal));
       literalt l_c=solver.convert(c);
-      goal_map[id(it->source.pc)].add_instance(it, l_c);
+      goal_map[id(it->source.program_counter)].add_instance(it, l_c);
     }
   }
 

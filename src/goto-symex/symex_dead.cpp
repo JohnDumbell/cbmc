@@ -19,7 +19,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_symext::symex_dead(statet &state)
 {
-  const goto_programt::instructiont &instruction=*state.source.pc;
+  const goto_programt::instructiont &instruction =
+    *state.source.program_counter;
 
   const code_deadt &code = to_code_dead(instruction.code);
 

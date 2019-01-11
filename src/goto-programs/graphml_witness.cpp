@@ -374,14 +374,15 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
       it!=equation.SSA_steps.end();
       it++, step_nr++) // we cannot replace this by a ranged for
   {
-    const source_locationt &source_location=it->source.pc->source_location;
+    const source_locationt &source_location =
+      it->source.program_counter->source_location;
 
-    if(it->hidden ||
-       (!it->is_assignment() && !it->is_goto() && !it->is_assert()) ||
-       (it->is_goto() && it->source.pc->guard.is_true()) ||
-       source_location.is_nil() ||
-       source_location.is_built_in() ||
-       source_location.get_line().empty())
+    if(
+      it->hidden ||
+      (!it->is_assignment() && !it->is_goto() && !it->is_assert()) ||
+      (it->is_goto() && it->source.program_counter->guard.is_true()) ||
+      source_location.is_nil() || source_location.is_built_in() ||
+      source_location.get_line().empty())
     {
       step_to_node[step_nr]=sink;
 
@@ -391,10 +392,11 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     // skip declarations followed by an immediate assignment
     symex_target_equationt::SSA_stepst::const_iterator next=it;
     ++next;
-    if(next!=equation.SSA_steps.end() &&
-       next->is_assignment() &&
-       it->ssa_full_lhs==next->ssa_full_lhs &&
-       it->source.pc->source_location==next->source.pc->source_location)
+    if(
+      next != equation.SSA_steps.end() && next->is_assignment() &&
+      it->ssa_full_lhs == next->ssa_full_lhs &&
+      it->source.program_counter->source_location ==
+        next->source.program_counter->source_location)
     {
       step_to_node[step_nr]=sink;
 
@@ -402,8 +404,8 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     }
 
     const graphmlt::node_indext node=graphml.add_node();
-    graphml[node].node_name=
-      std::to_string(it->source.pc->location_number)+"."+
+    graphml[node].node_name =
+      std::to_string(it->source.program_counter->location_number) + "." +
       std::to_string(step_nr);
     graphml[node].file=source_location.get_file();
     graphml[node].line=source_location.get_line();
@@ -433,8 +435,9 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
     symex_target_equationt::SSA_stepst::const_iterator next=it;
     std::size_t next_step_nr=step_nr;
     for(++next, ++next_step_nr;
-        next!=equation.SSA_steps.end() &&
-        (step_to_node[next_step_nr]==sink || it->source.pc==next->source.pc);
+        next != equation.SSA_steps.end() &&
+        (step_to_node[next_step_nr] == sink ||
+         it->source.program_counter == next->source.program_counter);
         ++next, ++next_step_nr)
     {
       // advance
@@ -475,11 +478,10 @@ void graphml_witnesst::operator()(const symex_target_equationt &equation)
           graphml[to].has_invariant=true;
           code_assignt assign(it->ssa_full_lhs, it->ssa_rhs);
           graphml[to].invariant=convert_assign_rec(identifier, assign);
-          graphml[to].invariant_scope=
-            id2string(it->source.pc->source_location.get_function());
+          graphml[to].invariant_scope = id2string(
+            it->source.program_counter->source_location.get_function());
         }
-        else if(it->is_goto() &&
-                it->source.pc->is_goto())
+        else if(it->is_goto() && it->source.program_counter->is_goto())
         {
           xmlt &val=edge.new_element("data");
           val.set_attribute("key", "sourcecode");

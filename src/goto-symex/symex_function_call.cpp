@@ -63,7 +63,7 @@ void goto_symext::parameter_assignments(
     // if you run out of actual arguments there was a mismatch
     if(it1==arguments.end())
     {
-      log.warning() << state.source.pc->source_location.as_string()
+      log.warning() << state.source.program_counter->source_location.as_string()
                     << ": "
                        "call to `"
                     << id2string(function_identifier)
@@ -72,7 +72,7 @@ void goto_symext::parameter_assignments(
                     << log.eom;
 
       rhs = side_effect_expr_nondett(
-        parameter_type, state.source.pc->source_location);
+        parameter_type, state.source.program_counter->source_location);
     }
     else
       rhs=*it1;
@@ -335,7 +335,7 @@ void goto_symext::pop_frame(statet &state)
     statet::framet &frame=state.top();
 
     // restore program counter
-    symex_transition(state, frame.calling_location.pc, false);
+    symex_transition(state, frame.calling_location.program_counter, false);
     state.source.function_id = frame.calling_location.function_id;
 
     // restore L1 renaming
@@ -445,7 +445,8 @@ void goto_symext::return_assignment(statet &state)
 {
   statet::framet &frame=state.top();
 
-  const goto_programt::instructiont &instruction=*state.source.pc;
+  const goto_programt::instructiont &instruction =
+    *state.source.program_counter;
   PRECONDITION(instruction.is_return());
   const code_returnt &code=to_code_return(instruction.code);
 

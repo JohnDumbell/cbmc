@@ -71,7 +71,7 @@ void goto_symext::symex_assign(
       assignment_type=symex_targett::assignment_typet::HIDDEN;
 
     // We hide if we are executing a hidden instruction.
-    if(state.source.pc->source_location.get_hide())
+    if(state.source.program_counter->source_location.get_hide())
       assignment_type=symex_targett::assignment_typet::HIDDEN;
 
     guardt guard{true_exprt{}}; // NOT the state guard!

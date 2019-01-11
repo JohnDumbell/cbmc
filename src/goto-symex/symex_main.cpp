@@ -49,15 +49,17 @@ void symex_transition(
   {
     // initialize the loop counter of any loop we are newly entering
     // upon this transition; we are entering a loop if
-    // 1. the transition from state.source.pc to "to" is not a backwards goto
+    // 1. the transition from state.source.program_counter to "to"
+    //    is not a backwards goto
     // or
     // 2. we are arriving from an outer loop
     goto_symext::statet::framet &frame = state.top();
     const goto_programt::instructiont &instruction=*to;
     for(const auto &i_e : instruction.incoming_edges)
-      if(i_e->is_goto() && i_e->is_backwards_goto() &&
-         (!is_backwards_goto ||
-          state.source.pc->location_number>i_e->location_number))
+      if(
+        i_e->is_goto() && i_e->is_backwards_goto() &&
+        (!is_backwards_goto ||
+         state.source.program_counter->location_number > i_e->location_number))
       {
         const auto loop_id =
           goto_programt::loop_id(state.source.function_id, *i_e);
@@ -65,12 +67,12 @@ void symex_transition(
       }
   }
 
-  state.source.pc=to;
+  state.source.program_counter = to;
 }
 
 void symex_transition(goto_symext::statet &state)
 {
-  goto_programt::const_targett next = state.source.pc;
+  goto_programt::const_targett next = state.source.program_counter;
   ++next;
   symex_transition(state, next, false);
 }
@@ -158,7 +160,7 @@ void goto_symext::initialize_entry_point(
   PRECONDITION(!state.call_stack().empty());
   state.source = symex_targett::sourcet(function_id, pc);
   state.top().end_of_function=limit;
-  state.top().calling_location.pc=state.top().end_of_function;
+  state.top().calling_location.program_counter = state.top().end_of_function;
   state.symex_target=&target;
 
   const goto_functiont &entry_point_function = get_goto_function(function_id);
@@ -172,7 +174,7 @@ void goto_symext::initialize_entry_point(
 
   state.dirty.populate_dirty_for_function(function_id, entry_point_function);
 
-  symex_transition(state, state.source.pc, false);
+  symex_transition(state, state.source.program_counter, false);
 }
 
 static void
@@ -182,13 +184,13 @@ switch_to_thread(goto_symex_statet &state, const unsigned int thread_nb)
   PRECONDITION(thread_nb < state.threads.size());
 
   // save PC
-  state.threads[state.source.thread_nr].pc = state.source.pc;
+  state.threads[state.source.thread_nr].pc = state.source.program_counter;
   state.threads[state.source.thread_nr].atomic_section_id =
     state.atomic_section_id;
 
   // get new PC
   state.source.thread_nr = thread_nb;
-  state.source.pc = state.threads[thread_nb].pc;
+  state.source.program_counter = state.threads[thread_nb].pc;
 
   state.guard = state.threads[thread_nb].guard;
 }
@@ -213,7 +215,7 @@ void goto_symext::symex_threaded_step(
     std::cout << "********* Now executing thread " << t << '\n';
 #endif
     switch_to_thread(state, t);
-    symex_transition(state, state.source.pc, false);
+    symex_transition(state, state.source.program_counter, false);
   }
 }
 
@@ -328,17 +330,20 @@ void goto_symext::symex_step(
   const get_goto_functiont &get_goto_function,
   statet &state)
 {
-  #if 0
-  std::cout << "\ninstruction type is " << state.source.pc->type << '\n';
-  std::cout << "Location: " << state.source.pc->source_location << '\n';
+#if 0
+  std::cout << "\ninstruction type is "
+            << state.source.program_counter->type << '\n';
+  std::cout << "Location: "
+            << state.source.program_counter->source_location << '\n';
   std::cout << "Guard: " << format(state.guard.as_expr()) << '\n';
-  std::cout << "Code: " << format(state.source.pc->code) << '\n';
-  #endif
+  std::cout << "Code: " << format(state.source.program_counter->code) << '\n';
+#endif
 
   PRECONDITION(!state.threads.empty());
   PRECONDITION(!state.call_stack().empty());
 
-  const goto_programt::instructiont &instruction=*state.source.pc;
+  const goto_programt::instructiont &instruction =
+    *state.source.program_counter;
 
   if(!symex_config.doing_path_exploration)
     merge_gotos(state);
@@ -389,7 +394,8 @@ void goto_symext::symex_step(
   case ASSERT:
     if(!state.guard.is_false())
     {
-      std::string msg=id2string(state.source.pc->source_location.get_comment());
+      std::string msg =
+        id2string(state.source.program_counter->source_location.get_comment());
       if(msg=="")
         msg="assertion";
       exprt tmp(instruction.guard);

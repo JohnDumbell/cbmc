@@ -61,6 +61,13 @@ public:
   // we remember all L1 renamings
   std::set<irep_idt> l1_history;
 
+  // Objects which hold the separate renaming logic for each level that a
+  // symex variable can be on. L0 relates to thread ID, L1 relates to frame ID
+  // (the number of times a function has been called), and L2 relates to
+  // generation ID.
+  //
+  // If looking at the VCC they're shown as !{threadID}@{frameID}#{generationID}
+  // on the end of a variables name.
   symex_level0t level0;
   symex_level1t level1;
   symex_level2t level2;

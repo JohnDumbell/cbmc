@@ -43,8 +43,8 @@ void show_vcc_plain(
     else
       out << '\n';
 
-    if(s_it->source.pc->source_location.is_not_nil())
-      out << s_it->source.pc->source_location << '\n';
+    if(s_it->source.program_counter->source_location.is_not_nil())
+      out << s_it->source.program_counter->source_location << '\n';
 
     if(s_it->comment != "")
       out << s_it->comment << '\n';
@@ -120,7 +120,8 @@ void show_vcc_json(
     // vcc object
     json_objectt &object = json_vccs.push_back(jsont()).make_object();
 
-    const source_locationt &source_location = s_it->source.pc->source_location;
+    const source_locationt &source_location =
+      s_it->source.program_counter->source_location;
     if(source_location.is_not_nil())
       object["sourceLocation"] = json(source_location);
 

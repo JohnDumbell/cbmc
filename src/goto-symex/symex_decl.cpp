@@ -21,7 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_symext::symex_decl(statet &state)
 {
-  const goto_programt::instructiont &instruction=*state.source.pc;
+  const goto_programt::instructiont &instruction =
+    *state.source.program_counter;
 
   const codet &code = instruction.code;
 
@@ -79,10 +80,9 @@ void goto_symext::symex_decl(statet &state, const symbol_exprt &expr)
 
   // we hide the declaration of auxiliary variables
   // and if the statement itself is hidden
-  bool hidden=
-    ns.lookup(expr.get_identifier()).is_auxiliary ||
-    state.top().hidden_function ||
-    state.source.pc->source_location.get_hide();
+  bool hidden = ns.lookup(expr.get_identifier()).is_auxiliary ||
+                state.top().hidden_function ||
+                state.source.program_counter->source_location.get_hide();
 
   target.decl(
     state.guard.as_expr(),

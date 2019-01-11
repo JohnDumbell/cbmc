@@ -35,7 +35,8 @@ void symex_bmct::symex_step(
   const get_goto_functiont &get_goto_function,
   statet &state)
 {
-  const source_locationt &source_location = state.source.pc->source_location;
+  const source_locationt &source_location =
+    state.source.program_counter->source_location;
 
   if(!source_location.is_nil() && last_source_location != source_location)
   {
@@ -45,18 +46,19 @@ void symex_bmct::symex_step(
     last_source_location = source_location;
   }
 
-  const goto_programt::const_targett cur_pc = state.source.pc;
+  const goto_programt::const_targett cur_pc = state.source.program_counter;
   const guardt cur_guard = state.guard;
 
   if(
-    !state.guard.is_false() && state.source.pc->is_assume() &&
-    simplify_expr(state.source.pc->guard, ns).is_false())
+    !state.guard.is_false() && state.source.program_counter->is_assume() &&
+    simplify_expr(state.source.program_counter->guard, ns).is_false())
   {
     log.statistics() << "aborting path on assume(false) at "
-                     << state.source.pc->source_location << " thread "
-                     << state.source.thread_nr;
+                     << state.source.program_counter->source_location
+                     << " thread " << state.source.thread_nr;
 
-    const irep_idt &c = state.source.pc->source_location.get_comment();
+    const irep_idt &c =
+      state.source.program_counter->source_location.get_comment();
     if(!c.empty())
       log.statistics() << ": " << c;
 
@@ -67,7 +69,7 @@ void symex_bmct::symex_step(
 
   if(
     record_coverage &&
-    // avoid an invalid iterator in state.source.pc
+    // avoid an invalid iterator in state.source.program_counter
     (!cur_pc->is_end_function() ||
      state.source.function_id != goto_functionst::entry_point()))
   {
@@ -78,11 +80,12 @@ void symex_bmct::symex_step(
     // transition from the goto instruction to its target to make
     // sure the goto is considered covered
     if(
-      cur_pc->is_goto() && cur_pc->get_target() != state.source.pc &&
+      cur_pc->is_goto() &&
+      cur_pc->get_target() != state.source.program_counter &&
       cur_pc->guard.is_true())
       symex_coverage.covered(cur_pc, cur_pc->get_target());
     else if(!state.guard.is_false())
-      symex_coverage.covered(cur_pc, state.source.pc);
+      symex_coverage.covered(cur_pc, state.source.program_counter);
   }
 }
 
@@ -90,7 +93,8 @@ void symex_bmct::merge_goto(
   const statet::goto_statet &goto_state,
   statet &state)
 {
-  const goto_programt::const_targett prev_pc = goto_state.source.pc;
+  const goto_programt::const_targett prev_pc =
+    goto_state.source.program_counter;
   const guardt prev_guard = goto_state.guard;
 
   goto_symext::merge_goto(goto_state, state);
@@ -102,7 +106,7 @@ void symex_bmct::merge_goto(
     !prev_guard.is_false() && !state.guard.is_false() &&
     // branches only, no single-successor goto
     !prev_pc->guard.is_true())
-    symex_coverage.covered(prev_pc, state.source.pc);
+    symex_coverage.covered(prev_pc, state.source.program_counter);
 }
 
 bool symex_bmct::should_stop_unwind(
@@ -110,15 +114,16 @@ bool symex_bmct::should_stop_unwind(
   const goto_symex_statet::call_stackt &context,
   unsigned unwind)
 {
-  const irep_idt id = goto_programt::loop_id(source.function_id, *source.pc);
+  const irep_idt id =
+    goto_programt::loop_id(source.function_id, *source.program_counter);
 
   tvt abort_unwind_decision;
   unsigned this_loop_limit = std::numeric_limits<unsigned>::max();
 
   for(auto handler : loop_unwind_handlers)
   {
-    abort_unwind_decision =
-      handler(context, source.pc->loop_number, unwind, this_loop_limit);
+    abort_unwind_decision = handler(
+      context, source.program_counter->loop_number, unwind, this_loop_limit);
     if(abort_unwind_decision.is_known())
       break;
   }
@@ -145,8 +150,8 @@ bool symex_bmct::should_stop_unwind(
   if(this_loop_limit != std::numeric_limits<unsigned>::max())
     log.statistics() << " (" << this_loop_limit << " max)";
 
-  log.statistics() << " " << source.pc->source_location << " thread "
-                   << source.thread_nr << log.eom;
+  log.statistics() << " " << source.program_counter->source_location
+                   << " thread " << source.thread_nr << log.eom;
 
   return abort;
 }

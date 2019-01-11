@@ -24,8 +24,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_symext::symex_goto(statet &state)
 {
-  const goto_programt::instructiont &instruction=*state.source.pc;
-  statet::framet &frame=state.top();
+  const goto_programt::instructiont &instruction =
+    *state.source.program_counter;
+  statet::framet &frame = state.top();
 
   if(state.guard.is_false())
   {
@@ -69,7 +70,7 @@ void goto_symext::symex_goto(statet &state)
     // is it label: goto label; or while(cond); - popular in SV-COMP
     if(
       symex_config.self_loops_to_assumptions &&
-      (goto_target == state.source.pc ||
+      (goto_target == state.source.program_counter ||
        (instruction.incoming_edges.size() == 1 &&
         *instruction.incoming_edges.begin() == goto_target)))
     {
@@ -85,8 +86,8 @@ void goto_symext::symex_goto(statet &state)
       return;
     }
 
-    const auto loop_id =
-      goto_programt::loop_id(state.source.function_id, *state.source.pc);
+    const auto loop_id = goto_programt::loop_id(
+      state.source.function_id, *state.source.program_counter);
 
     unsigned &unwind = frame.loop_iterations[loop_id].count;
     unwind++;
@@ -134,7 +135,7 @@ void goto_symext::symex_goto(statet &state)
   if(!backward)
   {
     new_state_pc=goto_target;
-    state_pc=state.source.pc;
+    state_pc = state.source.program_counter;
     state_pc++;
 
     // skip dead instructions
@@ -150,7 +151,7 @@ void goto_symext::symex_goto(statet &state)
   }
   else
   {
-    new_state_pc=state.source.pc;
+    new_state_pc = state.source.program_counter;
     new_state_pc++;
     state_pc=goto_target;
   }
@@ -301,8 +302,8 @@ void goto_symext::merge_gotos(statet &state)
   statet::framet &frame=state.top();
 
   // first, see if this is a target at all
-  statet::goto_state_mapt::iterator state_map_it=
-    frame.goto_state_map.find(state.source.pc);
+  statet::goto_state_mapt::iterator state_map_it =
+    frame.goto_state_map.find(state.source.program_counter);
 
   if(state_map_it==frame.goto_state_map.end())
     return; // nothing to do
@@ -328,7 +329,7 @@ void goto_symext::merge_goto(
   if(state.atomic_section_id != goto_state.atomic_section_id)
     throw incorrect_goto_program_exceptiont(
       "atomic sections differ across branches",
-      state.source.pc->source_location);
+      state.source.program_counter->source_location);
 
   // do SSA phi functions
   phi_function(goto_state, state);
@@ -558,7 +559,7 @@ void goto_symext::loop_bound_exceeded(
   statet &state,
   const exprt &guard)
 {
-  const unsigned loop_number=state.source.pc->loop_number;
+  const unsigned loop_number = state.source.program_counter->loop_number;
 
   exprt negated_cond;
 

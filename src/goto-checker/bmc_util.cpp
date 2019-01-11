@@ -245,7 +245,8 @@ std::vector<irep_idt> update_properties_status_from_symex_target_equation(
     const auto status = step.cond_expr.is_true() ? property_statust::PASS
                                                  : property_statust::UNKNOWN;
     auto emplace_result = properties.emplace(
-      property_id, property_infot{step.source.pc, step.comment, status});
+      property_id,
+      property_infot{step.source.program_counter, step.comment, status});
 
     if(emplace_result.second)
     {

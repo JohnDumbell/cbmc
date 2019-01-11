@@ -83,7 +83,7 @@ safety_checkert::resultt bmc_all_propertiest::operator()()
       if(property_id.empty())
         continue;
 
-      if(it->source.pc->is_goto())
+      if(it->source.program_counter->is_goto())
       {
         // goto may yield an unwinding assertion
         goal_map[property_id].description = it->comment;

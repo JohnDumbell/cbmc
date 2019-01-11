@@ -759,7 +759,8 @@ void goto_symex_statet::print_backtrace(std::ostream &out) const
     return;
   }
 
-  out << source.function_id << " " << source.pc->location_number << "\n";
+  out << source.function_id << " " << source.program_counter->location_number
+      << "\n";
 
   for(auto stackit = threads[source.thread_nr].call_stack.rbegin(),
            stackend = threads[source.thread_nr].call_stack.rend();
@@ -770,7 +771,7 @@ void goto_symex_statet::print_backtrace(std::ostream &out) const
     if(frame.calling_location.is_set)
     {
       out << frame.calling_location.function_id << " "
-          << frame.calling_location.pc->location_number << "\n";
+          << frame.calling_location.program_counter->location_number << "\n";
     }
   }
 }

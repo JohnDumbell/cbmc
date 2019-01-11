@@ -28,7 +28,8 @@ public:
   {
     std::ostringstream error_msg;
     error_msg << runtime_error::what();
-    error_msg << "\nSource GOTO statement: " << format(step.source.pc->code);
+    error_msg << "\nSource GOTO statement: "
+              << format(step.source.program_counter->code);
     error_msg << "\nStep:\n";
     step.output(error_msg);
     error_message = error_msg.str();

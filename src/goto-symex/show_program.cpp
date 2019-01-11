@@ -58,8 +58,9 @@ void show_program(const namespacet &ns, const symex_target_equationt &equation)
 
   for(const auto &step : equation.SSA_steps)
   {
-    std::cout << "// " << step.source.pc->location_number << " ";
-    std::cout << step.source.pc->source_location.as_string() << "\n";
+    std::cout << "// " << step.source.program_counter->location_number << " ";
+    std::cout << step.source.program_counter->source_location.as_string()
+              << "\n";
 
     if(step.is_assignment())
       show_step(ns, step, "", count);

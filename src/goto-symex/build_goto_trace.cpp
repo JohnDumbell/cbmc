@@ -144,7 +144,7 @@ void update_internal_field(
   // set internal field to CPROVER functions (e.g., __CPROVER_initialize)
   if(SSA_step.is_function_call())
   {
-    if(SSA_step.source.pc->source_location.as_string().empty())
+    if(SSA_step.source.program_counter->source_location.as_string().empty())
       goto_trace_step.internal=true;
   }
 
@@ -161,7 +161,8 @@ void update_internal_field(
     // "__CPROVER_*" function calls in __CPROVER_start are already marked as
     // internal. Don't mark any other function calls (i.e. "main"), function
     // arguments or any other parts of a code_function_callt as internal.
-    if(SSA_step.source.pc->code.get_statement()!=ID_function_call)
+    if(
+      SSA_step.source.program_counter->code.get_statement() != ID_function_call)
       goto_trace_step.internal=true;
   }
 }
@@ -303,7 +304,7 @@ void build_goto_trace(
       goto_trace_step.step_nr = ++step_nr;
 
       goto_trace_step.thread_nr = SSA_step.source.thread_nr;
-      goto_trace_step.pc = SSA_step.source.pc;
+      goto_trace_step.pc = SSA_step.source.program_counter;
       goto_trace_step.function_id = SSA_step.source.function_id;
       if(SSA_step.is_assert())
       {

@@ -55,7 +55,7 @@ void fault_localizationt::collect_guards(lpointst &lpoints)
     {
       if(!it->guard_literal.is_constant())
       {
-        lpoints[it->guard_literal].target=it->source.pc;
+        lpoints[it->guard_literal].target = it->source.program_counter;
         lpoints[it->guard_literal].score=0;
       }
     }
@@ -148,7 +148,7 @@ void fault_localizationt::run(irep_idt goal_id)
   PRECONDITION(failed != bmc.equation.SSA_steps.end());
 
   if(goal_id==ID_nil)
-    goal_id=failed->source.pc->source_location.get_property_id();
+    goal_id = failed->source.program_counter->source_location.get_property_id();
   lpointst &lpoints=lpoints_map[goal_id];
 
   // collect lpoints
@@ -171,7 +171,7 @@ void fault_localizationt::run(irep_idt goal_id)
 void fault_localizationt::report(irep_idt goal_id)
 {
   if(goal_id==ID_nil)
-    goal_id=failed->source.pc->source_location.get_property_id();
+    goal_id = failed->source.program_counter->source_location.get_property_id();
 
   lpointst &lpoints=lpoints_map[goal_id];
 
@@ -203,7 +203,7 @@ xmlt fault_localizationt::report_xml(irep_idt goal_id)
   xml_diagnosis.new_element("method").data="linear fault localization";
 
   if(goal_id==ID_nil)
-    goal_id=failed->source.pc->source_location.get_property_id();
+    goal_id = failed->source.program_counter->source_location.get_property_id();
 
   xml_diagnosis.set_attribute("property", id2string(goal_id));
 
