@@ -66,24 +66,30 @@ exprt guard_bddt::guard_expr(exprt expr) const
 
 guard_bddt &guard_bddt::append(const guard_bddt &guard)
 {
+  manager.invalidate_cache(bdd);
   bdd = bdd.bdd_and(guard.bdd);
   return *this;
 }
 
 guard_bddt &guard_bddt::add(const exprt &expr)
 {
+  manager.invalidate_cache(bdd);
   bdd = bdd.bdd_and(manager.from_expr(expr));
   return *this;
 }
 
 guard_bddt &operator-=(guard_bddt &g1, const guard_bddt &g2)
 {
+  g1.manager.invalidate_cache(g1.bdd);
+  g2.manager.invalidate_cache(g2.bdd);
   g1.bdd = g1.bdd.constrain(g2.bdd.bdd_or(g1.bdd));
   return g1;
 }
 
 guard_bddt &operator|=(guard_bddt &g1, const guard_bddt &g2)
 {
+  g1.manager.invalidate_cache(g1.bdd);
+  g2.manager.invalidate_cache(g2.bdd);
   g1.bdd = g1.bdd.bdd_or(g2.bdd);
   return g1;
 }

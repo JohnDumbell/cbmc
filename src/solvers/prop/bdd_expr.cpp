@@ -123,7 +123,7 @@ static exprt make_or(exprt a, exprt b)
 exprt bdd_exprt::as_expr(
   const bdd_nodet &r,
   bool complement,
-  std::unordered_map<bdd_nodet::idt, exprt> &cache) const
+  cache_node *parent)
 {
   if(r.is_constant())
   {
@@ -138,10 +138,11 @@ exprt bdd_exprt::as_expr(
   const exprt &n_expr = node_map[index];
 
   // Look-up cache for already computed value
-  auto insert_result = cache.emplace(r.id(), nil_exprt());
+  auto insert_result = cache.emplace(r.id(), new cache_node());
+  cache_node *node = insert_result.first->second;
   if(insert_result.second)
   {
-    insert_result.first->second = [&]() -> exprt {
+    node->cached_expression = [&]() -> exprt {
       if(r.else_branch().is_constant())
       {
         if(r.then_branch().is_constant())
@@ -159,14 +160,14 @@ exprt bdd_exprt::as_expr(
               as_expr(
                 r.then_branch(),
                 complement != r.then_branch().is_complement(),
-                cache));
+                node));
           }
           return make_or(
             not_exprt(n_expr),
             as_expr(
               r.then_branch(),
               complement != r.then_branch().is_complement(),
-              cache));
+              node));
         }
       }
       else if(r.then_branch().is_constant())
@@ -178,33 +179,36 @@ exprt bdd_exprt::as_expr(
             as_expr(
               r.else_branch(),
               complement != r.else_branch().is_complement(),
-              cache));
+              node));
         }
         return make_or(
           n_expr,
           as_expr(
             r.else_branch(),
             complement != r.else_branch().is_complement(),
-            cache));
+            node));
       }
       return if_exprt(
         n_expr,
         as_expr(
           r.then_branch(),
           r.then_branch().is_complement() != complement,
-          cache),
+          node),
         as_expr(
           r.else_branch(),
           r.else_branch().is_complement() != complement,
-          cache));
+          node));
     }();
   }
-  return insert_result.first->second;
+
+  if (node->parent == nullptr)
+    node->parent = parent;
+
+  return *insert_result.first->second->cached_expression;
 }
 
-exprt bdd_exprt::as_expr(const bddt &root) const
+exprt bdd_exprt::as_expr(const bddt &root)
 {
-  std::unordered_map<bdd_nodet::idt, exprt> cache;
   bdd_nodet node = bdd_mgr.bdd_node(root);
-  return as_expr(node, node.is_complement(), cache);
+  return as_expr(node, node.is_complement(), nullptr);
 }
