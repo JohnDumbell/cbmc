@@ -23,6 +23,19 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <stack>
 
+/// Prints relative size of an exprt.
+std::size_t exprt::depth()
+{
+  int depth = 0;
+  for(auto it = this->depth_begin(); it != this->depth_end();)
+  {
+    depth++;
+    ++it;
+  }
+
+  return depth;
+}
+
 /// Move the given argument to the end of `exprt`'s operands.
 /// The argument is destroyed and mutated to a reference to a nil `irept`.
 /// \param expr: `exprt` to append to the operands

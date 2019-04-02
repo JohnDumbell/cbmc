@@ -84,6 +84,8 @@ public:
     return static_cast<const typet &>(find(ID_type));
   }
 
+  std::size_t depth();
+
   /// Return true if there is at least one operand.
   bool has_operands() const
   { return !operands().empty(); }
